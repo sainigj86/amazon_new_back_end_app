@@ -85,7 +85,7 @@ userRouter.post("/api/order", auth, async (req, res) => {
       if (product.quantity >= cart[i].quantity) {
         console.log("order is placed")
         product.quantity -= cart[i].quantity;
-        products.push({ product, quantity: cart[i].quantity });
+        products.push({ product, quantity: cart[i].quantity, });
         await product.save();
       } else {
         console.log("is out of stock")

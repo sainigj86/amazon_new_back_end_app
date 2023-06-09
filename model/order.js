@@ -31,6 +31,9 @@ const orderSchema = mongoose.Schema({
     type: Number,
     default: 0,
   },
+  merchantId: {
+    type: String,
+  },
 });
 
 const Order = mongoose.model("Order", orderSchema);

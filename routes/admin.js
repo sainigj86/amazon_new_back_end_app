@@ -34,10 +34,10 @@ adminRouter.post("/admin/get-product", admin, async (req, res) => {
     try {
         // console.log("merchantId = " + products);
         var merchantId = req.body.merchantId;
-        console.log("merchantId = " + merchantId);
-        
-        const products = await Product.find({merchantId:merchantId});
-        console.log("products = " + JSON.stringify(products));
+        // console.log("merchantId = " + merchantId);
+
+        const products = await Product.find({ merchantId: merchantId });
+        // console.log("products = " + JSON.stringify(products));
         res.json(products);
     } catch (e) {
         console.log("errror " + e)
@@ -56,12 +56,27 @@ adminRouter.post("/admin/delete-product", admin, async (req, res) => {
     }
 });
 
-adminRouter.get("/admin/get-orders", admin, async (req, res) => {
+adminRouter.post("/admin/get-orders", admin, async (req, res) => {
     try {
-        const orders = await Order.find({});
-        res.json(orders);
+        const { merchantId } = req.body;
+        // console.log("Merchant ID:", merchantId);
+        const orders = await Order.find({})
+            .populate({
+                path: 'products.product',
+                match: { merchantId: merchantId },
+            })
+            .exec();
+        // Filter out orders with unmatched products
+        const filteredOrders = orders.filter((order) =>
+            order.products.some(
+                (product) => product.product && product.product.merchantId === merchantId
+            )
+        );
+
+        console.log(filteredOrders);
+        res.json(filteredOrders);
     } catch (e) {
-        res.status.json({ error: e.message });
+        res.json({ error: e.message });
     }
 });
 
